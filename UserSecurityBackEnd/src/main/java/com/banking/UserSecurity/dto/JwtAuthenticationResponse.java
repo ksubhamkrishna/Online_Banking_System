@@ -1,0 +1,11 @@
+package com.banking.UserSecurity.dto;
+
+import lombok.Data;
+
+@Data
+public class JwtAuthenticationResponse {
+
+    private String token;
+
+    private String refreshToken;
+}
