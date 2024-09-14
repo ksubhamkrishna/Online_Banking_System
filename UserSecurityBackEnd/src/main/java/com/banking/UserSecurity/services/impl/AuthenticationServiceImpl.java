@@ -28,17 +28,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JWTService jwtService;
 
-    public User signup(SignUpRequest signUpRequest){
+    @Override
+    public void signup(SignUpRequest signUpRequest) {
+        if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User with this email already exists");
+        }
+
         User user = new User();
+        Role role = "admin".equalsIgnoreCase(signUpRequest.getUserType()) ? Role.ADMIN : Role.USER;
 
         user.setEmail(signUpRequest.getEmail());
         user.setFirstname(signUpRequest.getFirstName());
         user.setSecondname(signUpRequest.getLastName());
-        user.setRole(Role.USER);
+        user.setRole(role);
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setAadhar(signUpRequest.getAadharNumber());
+        user.setPan(signUpRequest.getPanNumber());
 
-        return userRepository.save(user);
-
+        userRepository.save(user);
     }
 
     public JwtAuthenticationResponse signin(SigninRequest signinRequest){

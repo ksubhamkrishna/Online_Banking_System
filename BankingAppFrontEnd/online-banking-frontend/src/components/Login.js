@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate} from 'react-router-dom'
+import axios from 'axios'
+import {jwtDecode} from 'jwt-decode';
+
+// Suppose you have the JWT token stored in local storage
+const token = localStorage.getItem('token');
+
+// Decode the token
+const decodedToken = jwtDecode(token);
+
+console.log(decodedToken);
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,18 +20,36 @@ const Login = () => {
 
   const navigator = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    
     if (email === '' || password === '') {
       setError('Both fields are required.');
       return;
     }
-    // Add your login logic here
-    console.log('Login attempted with:', { email, password });
-    setError('');
 
-   
+    try {
+      const response = await axios.post('http://localhost:8080/api/v1/auth/signin', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const { token } = response.data;
+      // Store JWT token in local storage
+      localStorage.setItem('token', token);
+
+      // Redirect to home or dashboard
+      navigator('/home'); // Adjust path as necessary
+
+    } catch (error) {
+      setError('Invalid email or password.');
+    }
   };
+
   function RegistrationForm() {
     navigator('/register');
 }

@@ -24,10 +24,10 @@ export const Header = () => {
         <div className="collapse navbar-collapse" id="navbarNavDropdown">
           <ul className="navbar-nav">
             <li className="nav-item active">
-              <NavLink className="nav-link text-white" to="#">Home </NavLink>
+              <NavLink className="nav-link text-white" to="/home">Home </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link text-white" to="/login">Login</NavLink>
+              <NavLink className="nav-link text-white" to="/">Login</NavLink>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link text-white" to="#"></NavLink>

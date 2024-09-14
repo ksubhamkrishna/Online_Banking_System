@@ -1,28 +1,35 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // For routing
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { Home } from './components/Home';
+import Home from './components/Home';
 import Login from './components/Login';
 import RegistrationForm from './components/RegistrationForm';
+import { Footer } from './components/Footer';
+import { Header } from './components/Header';
+import { Profile } from './components/Profile';
+
 
 function App() {
   return (
 
       <Router>
+          <div className="d-flex flex-column min-vh-100">
         {/* Header is usually outside the Routes so that it appears on every page */}
-        <Home/>
+        {/* <Header /> */}
 
         {/* Defining routes inside the Routes component */}
         <Routes>
           
-           <Route path="/login" element = {<Login/>} /> 
+           <Route path="/" element = {<Login/>} /> 
            <Route path="/register" element = {<RegistrationForm/>} /> 
+           <Route path="/home" element = {<Home/>} />
+           <Route path="/profile" element = {<Profile/>} />
         
         </Routes>
 
         {/* Footer is usually outside the Routes so that it appears on every page */}
       
+        </div>
       </Router>
   );
 }

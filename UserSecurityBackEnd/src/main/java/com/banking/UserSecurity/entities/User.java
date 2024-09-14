@@ -1,6 +1,8 @@
 package com.banking.UserSecurity.entities;
 
 import jakarta.persistence.*;
+
+
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,6 +29,12 @@ public class User implements UserDetails {
     private String password;
 
     private Role role;
+
+    private String aadhar;
+
+    @Column(name = "pan", nullable = false) // Ensure correct column name and nullability
+    private String pan;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

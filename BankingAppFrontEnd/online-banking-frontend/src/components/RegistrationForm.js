@@ -1,121 +1,147 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import  saveCustomer  from './service/BankService';
 
 const RegistrationForm = () => {
-  const [firstname, setFirstname] = useState('');
-  const [secondname, setSecondname] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
-  const [error, setError] = useState('');
-  const navigator = useNavigate();
+  const [userType, setUserType] = useState(''); // Either "admin" or "user"
+  const [aadharNumber, setAadharNumber] = useState('');
+  const [panNumber, setPANNumber] = useState('');
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-// const handleSubmit = (event) => {
-//     event.preventDefault();
-//     if (!firstname || !secondname || !email || !password || !role) {
-//       setError('All fields are required.');
-//       return;
-//     }
-//     // Add your registration logic here
-//     console.log('Registration data:', { firstname, secondname, email, password, role });
-//     setError('');
-//   };
+function Login(){
+    navigate("/");
+}
 
-  function LoginFunction(){
-    navigator('/login')
-  }
+  // Form validation function
+  const validateForm = () => {
+    let valid = true;
+    const errorsCopy = {};
 
-  function createCustomer(e){
+    if (!firstName.trim()) {
+      errorsCopy.firstName = 'First name is required';
+      valid = false;
+    }
+    if (!lastName.trim()) {
+      errorsCopy.lastName = 'Last name is required';
+      valid = false;
+    }
+    if (!email.trim()) {
+      errorsCopy.email = 'Email is required';
+      valid = false;
+    }
+    if (!password.trim()) {
+      errorsCopy.password = 'Password is required';
+      valid = false;
+    }
+    if (!aadharNumber.trim()) {
+      errorsCopy.aadharNumber = 'Aadhar number is required';
+      valid = false;
+    }
+    if (!panNumber.trim()) {
+        errorsCopy.panNumber = 'PAN number is required';
+        valid = false;
+      }
+  
+    setErrors(errorsCopy);
+    return valid;
+  };
+
+  // Function to handle form submission
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    if(validateForm()){
+    if (validateForm()) {
+      const signUpRequest = { firstName, lastName, email, password, userType, aadharNumber,panNumber };
 
-        const customer= {firstname,secondname,email,password,role}
-        console.log(customer);
-            saveCustomer(customer).then((response) => {
-                console.log(response.data);
-                navigator('/login')
-                            }).catch(error =>{
-                               console.error(error); 
-                            })
-                }
-            
-            
-            }
+      try {
+        
+        // POST request to your signup API
+        console.log(signUpRequest);
+        const response = await axios.post('http://localhost:8080/api/v1/auth/signup', signUpRequest);
 
-  function validateForm(){
-    let valid = true;
-
-    const errorsCopy = {... error}
-
-    if(firstname.trim()){
-        errorsCopy.firstName = '';
+        if (response.status === 200) {
+          setSuccessMessage('User registered successfully!');
+          setErrorMessage('');
+          
+          // Redirect to login after 2 seconds
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error:', error.response || error.message);
+        if (error.response && error.response.status === 400) {
+          setErrorMessage('User already exists or invalid data.');
+        } else {
+          setErrorMessage('Registration failed. Please try again.');
+        }
+        setSuccessMessage(''); // Clear success message if there's an error
+      }
     }
-    else{
-        errorsCopy.firstName='First name is required';
-        valid = false;
-    }
-
-    if(secondname.trim()){
-        errorsCopy.secondname = '';
-    }
-    else{
-        errorsCopy.lastName='First name is required';
-        valid = false;
-    }
-    if(email.trim()){
-        errorsCopy.email = '';
-    }else {
-        errorsCopy.email = 'Email is required';
-        valid = false;
-    }
-
-    if(password.trim()){
-        errorsCopy.password = '';
-    }else {
-        errorsCopy.password = 'Phone Number is required';
-        valid = false;
-    }
-
-    setError(errorsCopy);
-
-    return valid;
-
-}
+  };
 
   return (
     <div className="container">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <h2 className="text-center mb-4">Register</h2>
-          {error && <div className="alert alert-danger">{error}</div>}
-          <form>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="alert alert-success" role="alert">
+              {successMessage}
+            </div>
+          )}
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="alert alert-danger" role="alert">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Validation Errors */}
+          {Object.keys(errors).length > 0 && (
+            <div className="alert alert-danger">
+              {Object.values(errors).map((err, index) => (
+                <div key={index}>{err}</div>
+              ))}
+            </div>
+          )}
+
+          <form onSubmit={handleRegister}>
             <div className="form-group mb-3">
-              <label htmlFor="firstname">First Name</label>
+              <label htmlFor="firstName">First Name</label>
               <input
                 type="text"
-                id="firstname"
+                id="firstName"
                 className="form-control"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
               />
             </div>
             <div className="form-group mb-3">
-              <label htmlFor="secondname">Second Name</label>
+              <label htmlFor="lastName">Last Name</label>
               <input
                 type="text"
-                id="secondname"
+                id="lastName"
                 className="form-control"
-                value={secondname}
-                onChange={(e) => setSecondname(e.target.value)}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
               />
             </div>
             <div className="form-group mb-3">
-              <label htmlFor="email">Email address</label>
+              <label htmlFor="email">Email</label>
               <input
                 type="email"
                 id="email"
@@ -136,23 +162,50 @@ const RegistrationForm = () => {
                 required
               />
             </div>
+
             <div className="form-group mb-3">
-              <label htmlFor="role">Role</label>
-              <select
-                id="role"
+              <label htmlFor="aadharNumber">Aadhar Card Number</label>
+              <input
+                type="text"
+                id="aadharNumber"
                 className="form-control"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
+                value={aadharNumber}
+                onChange={(e) => setAadharNumber(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group mb-3">
+              <label htmlFor="PANNUmber">PAN Number</label>
+              <input
+                type="text"
+                id="PANNumber"
+                className="form-control"
+                value={panNumber}
+                onChange={(e) => setPANNumber(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* <div className="form-group mb-3">
+              <label htmlFor="userType">Role</label>
+              <select
+                id="userType"
+                className="form-control"
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
                 required
               >
                 <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-                {/* Add more roles as needed */}
+                <option value="admin">ADMIN</option>
+                <option value="user">USER</option>
               </select>
-            </div>
-            <button type="submit" className="btn btn-primary w-100 mb-2" onSubmit={createCustomer}>Register</button>
-            <button type="submit" className="btn btn-secondary w-100" onClick={LoginFunction}>Login</button>
+            </div> */}
+            <button type="submit" className="btn btn-primary w-100 mb-2">
+              Register
+            </button>
+            <button type="button" className="btn btn-secondary w-100" onClick={Login}>
+              Login
+            </button>
           </form>
         </div>
       </div>
