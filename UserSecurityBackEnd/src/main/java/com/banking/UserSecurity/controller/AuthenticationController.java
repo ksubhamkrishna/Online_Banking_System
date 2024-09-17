@@ -1,10 +1,13 @@
 package com.banking.UserSecurity.controller;
 
 import com.banking.UserSecurity.ApiResponse;
+import com.banking.UserSecurity.dto.AccountDto;
 import com.banking.UserSecurity.dto.JwtAuthenticationResponse;
 import com.banking.UserSecurity.dto.SignUpRequest;
 import com.banking.UserSecurity.dto.SigninRequest;
+import com.banking.UserSecurity.entities.AccountDetails;
 import com.banking.UserSecurity.entities.User;
+import com.banking.UserSecurity.services.AccountDetailsService;
 import com.banking.UserSecurity.services.AuthenticationService;
 import com.banking.UserSecurity.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +27,14 @@ public class AuthenticationController {
 
     private final UserService userService;
 
+    private final AccountDetailsService accountDetailsService;
+
     @Autowired
-    public AuthenticationController(UserService userService,AuthenticationService authenticationService){
+    public AuthenticationController(UserService userService, AuthenticationService authenticationService, AccountDetailsService accountDetailsService){
         this.userService = userService;
         this.authenticationService = authenticationService;
+        this.accountDetailsService = accountDetailsService;
+
     }
 
     @PostMapping("/signup")
@@ -45,12 +52,35 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<JwtAuthenticationResponse> signin(@RequestBody SigninRequest signinRequest){
+    public ResponseEntity<JwtAuthenticationResponse> signin(@RequestBody SigninRequest signinRequest) {
         return ResponseEntity.ok(authenticationService.signin(signinRequest));
     }
 
     @GetMapping("/user/{email}")
     public Optional<User> getUserById(@PathVariable String email) {
         return userService.findUserByEmail(email);
+    }
+
+    @GetMapping("/account_details/{email}")
+    public Optional<AccountDetails> accountDetailsByEmail(@PathVariable String email){
+
+        Optional<AccountDetails> accountDetails = accountDetailsService.findUserByEmailService(email);
+
+        if(accountDetails.isPresent()) {
+            return accountDetails;
+        }
+        else{
+            throw new Shubam("Account is not Found");
+        }
+
+    }
+
+    @PostMapping("/save_account_details")
+    public ResponseEntity<?> accountDetailsCreating(@RequestBody AccountDto accountDto){
+
+        accountDetailsService.saveBankDetailsService(accountDto);
+
+        return ResponseEntity.ok(new ApiResponse("Bank Details Entered successfully"));
+
     }
 }

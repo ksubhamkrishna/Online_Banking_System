@@ -2,15 +2,6 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate} from 'react-router-dom'
 import axios from 'axios'
-import {jwtDecode} from 'jwt-decode';
-
-// Suppose you have the JWT token stored in local storage
-const token = localStorage.getItem('token');
-
-// Decode the token
-const decodedToken = jwtDecode(token);
-
-console.log(decodedToken);
 
 
 const Login = () => {
